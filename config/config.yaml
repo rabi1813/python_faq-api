@@ -1,0 +1,6 @@
+host: "localhost"
+user: "root"
+password: "Rabi@1991"
+db_name: "sakila"
+auto_commit_flag: true
+cursor_type: "dict"
