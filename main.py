@@ -12,6 +12,7 @@ utils_object = UtilityMethods()
 operations_object = GeneralOperations()
 app = common_utils_object.generate_flask_app()
 
+
 @app.route("/actor", methods=["GET"])
 def actor():
     """
@@ -24,6 +25,7 @@ def actor():
         return request_details
     response = operations_object.get_actor(request_details)
     return response
+
 
 if __name__ == "__main__":
     app.run()

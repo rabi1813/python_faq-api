@@ -26,9 +26,6 @@ class GeneralOperations(SQLConstants):
                  If False, returns Error
         """
         flag, connection = sql_object.mysql_connector()
-
-        print(flag)
-        print(connection)
         if flag is False:
             return connection
         method = request_details.get("method")

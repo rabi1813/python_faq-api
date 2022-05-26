@@ -3,9 +3,11 @@ Common Utilities
 """
 import json
 import flask
+import yaml
 from string_literals import Constants, ErrorMessages
 
-class CommonUtilsMethods():
+
+class CommonUtilsMethods:
     """
     Class for Common Utility Methods
     """
@@ -18,12 +20,13 @@ class CommonUtilsMethods():
         :param request: API Request
         :return: Request details
         """
-        request_details = {}
-        request_details["method"] = request.method
-        request_details["query_params"] = request.args.to_dict()
-        request_details["headers"] = {key.lower(): value
-                                      for key, value in dict(request.headers).items()}
-        request_details["payload"] = request.data.decode("utf-8")
+        request_details = {
+            "method": request.method,
+            "query_params": request.args.to_dict(),
+            "headers": {key.lower(): value
+                        for key, value in dict(request.headers).items()},
+            "payload": request.data.decode("utf-8")
+        }
         return request_details
 
     @staticmethod
@@ -36,6 +39,16 @@ class CommonUtilsMethods():
         app.config["DEBUG"] = True
 
         return app
+
+    @staticmethod
+    def read_config_file():
+        """
+        Read Config File
+        :return:Config Data
+        """
+        with open(Constants.CONFIG_FILE, 'r') as config:
+            config_details = yaml.load(config, Loader=yaml.FullLoader)
+        return config_details
 
 
 class ValidationMethods(Constants, ErrorMessages):

@@ -7,10 +7,13 @@ import pymysql.cursors
 from pymysql.constants import CLIENT
 from string_literals import SQLConstants
 from common_utils import ValidationMethods
+from security_operations import SecurityMethods
 
 validation_object = ValidationMethods()
+security_object = SecurityMethods()
 
-class SQLUtilityMethods():
+
+class SQLUtilityMethods:
     """
     Methods for SQL Utility operations
     """
@@ -41,6 +44,7 @@ class SQLUtilityMethods():
                 records[key] = value.strftime("%Y-%m-%d %H:%M:%S")
         return records
 
+
 class SQLMethods(SQLUtilityMethods, SQLConstants):
     """
     Methods for SQL operations
@@ -53,27 +57,23 @@ class SQLMethods(SQLUtilityMethods, SQLConstants):
         Creates MySQL Connector
         :return: MySQL Connector object
         """
-        host = "localhost"
-        user = "root3"
-        password = "Rabi@1991"
-        db_name = "sakila"
-        auto_commit_flag = True
-        cursor_type = "dict"
+        config_data = security_object.decrypted_config()
+        print(config_data)
 
-        if cursor_type == "dict":
+        if config_data.get("cursor_type") == "dict":
             cursor_class = pymysql.cursors.DictCursor
         else:
             cursor_class = pymysql.cursors.Cursor
 
         try:
-            connection = pymysql.connect(host=host,
-                                         user=user,
-                                         password=password,
-                                         db=db_name,
+            connection = pymysql.connect(host=config_data.get("host"),
+                                         user=config_data.get("user"),
+                                         password=config_data.get("password"),
+                                         db=config_data.get("db_name"),
                                          charset='utf8mb4',
                                          cursorclass=cursor_class,
                                          client_flag=CLIENT.MULTI_STATEMENTS,
-                                         autocommit=auto_commit_flag)
+                                         autocommit=config_data.get("auto_commit_flag"))
             print("Connected to db")
             return True, connection
         except pymysql.err.OperationalError as exp:

@@ -1,13 +1,18 @@
 """
 File to store all constant values
 """
-class Constants():
+import os
+
+
+class Constants:
     """
     General Constants
     """
     __slots__ = ()
+
     def __str__(self):
         return self.__class__.__name__
+
     @staticmethod
     def bypass_pylint():
         """
@@ -20,13 +25,16 @@ class Constants():
     JSON_CONTENT_TYPE = "application/json"
     GET_METHOD = "GET"
     NON_GET_METHODS = ["POST", "PUT", "PATCH", "DELETE"]
+    FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+    CONFIG_FILE = os.path.join(FILE_DIR, "config", "config.yaml")
 
 
-class SQLConstants():
+class SQLConstants:
     """
     SQL related constants
     """
     __slots__ = ()
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -46,6 +54,7 @@ class ErrorMessages:
     Error Messages
     """
     __slots__ = ()
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -55,7 +64,7 @@ class ErrorMessages:
         Test Function
         :return: None
         """
-    GENERAL_ERROR_MESSAGE = "Error Occured"
+    GENERAL_ERROR_MESSAGE = "Error Occurred"
     DB_CONNECTION_FAIL = "Failed to connect DB"
     INVALID_METHOD = "Invalid Request Method"
     INVALID_CONTENT_TYPE = "Invalid Content-type"
