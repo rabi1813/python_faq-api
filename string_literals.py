@@ -45,8 +45,18 @@ class SQLConstants:
         :return: None
         """
     GET_LIST_WHERE_CONDITION = " where {0} between {1} and {2};"
-    SELECT_ACTOR = "select * from actor"
+    GET_LIST_ID_BASED = " where {0} = '{1}';"
+    SELECT_QUERY = "select * from {0}"
     TABLE_ROW_COUNTER = "select count(*) as count from {0};"
+    PRE_DELETE = "select count(*) as count from {0} where {1} = '{2}';"
+
+    INSERT_MASTER_QUERY = "Insert into master (master_id, type, query, answer) values " \
+                          "(%(master_id)s, %(type)s, %(query)s, %(answer)s);"
+    DELETE_MASTER_QUERY = "Delete from master where master_id = (%(master_id)s;"
+    MASTER_PREFIX = "MTR"
+    MASTER_TABLE = "master"
+    MASTER_SEQ_TABLE = "master_seq"
+    MASTER_ID_ZERO_COUNT = 9
 
 
 class ErrorMessages:
@@ -66,11 +76,11 @@ class ErrorMessages:
         """
     GENERAL_ERROR_MESSAGE = "Error Occurred"
     DB_CONNECTION_FAIL = "Failed to connect DB"
+    ID_GENERATION_FAILURE = "Unique ID Generation Failed"
+    PRE_DELETE_CHECK = "ID: {0} doesn't exist"
     INVALID_METHOD = "Invalid Request Method"
     INVALID_CONTENT_TYPE = "Invalid Content-type"
     INVALID_HEADER = "Mandatory header missing : {0}"
     INVALID_PAYLOAD = "Internal Server Error"
     INVALID_RECORDS_VALUE = "Value of query param: '{0}' must be integer"
-    ERROR_MESSAGE_TEMPLATE = message = {
-        "error_message": ""
-    }
+    ERROR_MESSAGE_TEMPLATE = message = {}

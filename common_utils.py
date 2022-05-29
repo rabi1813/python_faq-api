@@ -101,6 +101,10 @@ class ValidationMethods(Constants, ErrorMessages):
             self.ERROR_MESSAGE_TEMPLATE["error_message"] = message
         elif validation_type == "db_connect":
             self.ERROR_MESSAGE_TEMPLATE["error_message"] = self.DB_CONNECTION_FAIL
+        elif validation_type == "id_generation":
+            self.ERROR_MESSAGE_TEMPLATE["error_message"] = self.ID_GENERATION_FAILURE
+        elif validation_type == "pre_delete_check":
+            self.ERROR_MESSAGE_TEMPLATE["error_message"] = message
         else:
             self.ERROR_MESSAGE_TEMPLATE["error_message"] = self.GENERAL_ERROR_MESSAGE
         return False, flask.Response(json.dumps(self.ERROR_MESSAGE_TEMPLATE), status=status_code,

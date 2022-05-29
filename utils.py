@@ -22,7 +22,10 @@ class UtilityMethods(SQLMethods, ValidationMethods):
         query_params = request_details.get("query_params")
         record_start = query_params.get("record_start")
         record_end = query_params.get("record_end")
-        table_row_count = self.row_counter(connection, table_name)
+        flag, table_row_count = self.row_counter(connection, table_name)
+
+        if flag is False:
+            return flag, table_row_count
         if record_start is None:
             query_params['record_start'] = 0
         else:
@@ -31,4 +34,4 @@ class UtilityMethods(SQLMethods, ValidationMethods):
             query_params['record_end'] = table_row_count
         else:
             query_params['record_end'] = int(query_params['record_end'])
-        return request_details
+        return True, request_details

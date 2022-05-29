@@ -2,3 +2,5 @@ flask
 pyyaml
 pylint
 cryptography
+pyjwt
+Flask-SQLAlchemy

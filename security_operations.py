@@ -44,10 +44,10 @@ class SecurityMethods:
         """
         key = self.load_key(config_details.get("secret"))
         encoded_message = normal_string.encode()
-        f = Fernet(key)
-        encrypted_message = f.encrypt(encoded_message)
-        encrypted_message = f.encrypt(encrypted_message)
-        encrypted_message = f.encrypt(encrypted_message)
+        fernet_object = Fernet(key)
+        encrypted_message = fernet_object.encrypt(encoded_message)
+        encrypted_message = fernet_object.encrypt(encrypted_message)
+        encrypted_message = fernet_object.encrypt(encrypted_message)
 
         return encrypted_message.decode()
 
@@ -59,10 +59,10 @@ class SecurityMethods:
         :return: Decrypted String
         """
         key = self.load_key(config_details.get("secret"))
-        f = Fernet(key)
-        decrypted_message = f.decrypt(encrypted_message.encode())
-        decrypted_message = f.decrypt(decrypted_message)
-        decrypted_message = f.decrypt(decrypted_message)
+        fernet_object = Fernet(key)
+        decrypted_message = fernet_object.decrypt(encrypted_message.encode())
+        decrypted_message = fernet_object.decrypt(decrypted_message)
+        decrypted_message = fernet_object.decrypt(decrypted_message)
 
         return decrypted_message.decode()
 
