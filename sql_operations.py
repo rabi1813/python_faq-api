@@ -8,9 +8,11 @@ from pymysql.constants import CLIENT
 from string_literals import SQLConstants, ErrorMessages
 from common_utils import ValidationMethods
 from security_operations import SecurityMethods
+from log_services import log_initializer
 
 validation_object = ValidationMethods()
 security_object = SecurityMethods()
+logger = log_initializer()
 
 
 class SQLUtilityMethods:
@@ -73,10 +75,10 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                                          cursorclass=cursor_class,
                                          client_flag=CLIENT.MULTI_STATEMENTS,
                                          autocommit=config_data.get("auto_commit_flag"))
-            print("Connected to db")
+            logger.info("Connected to db")
             return True, connection
         except pymysql.err.OperationalError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 validation_type="db_connect",
                 status_code=500
@@ -93,10 +95,14 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         """
         try:
             with connection.cursor() as cursor:
-                print(f'Querying SQL : {query}')
+                if payload:
+                    query_string = query.replace("%(", "'%(").replace(")s", ")s'") % payload
+                    logger.info('Querying SQL : %s', query_string)
+                else:
+                    logger.info(f'Querying SQL : {query}')
                 payload = payload if payload else {}
                 cursor.execute(query, payload)
-                if "select" in query.lower():
+                if "select" in query.lower() or "show" in query.lower() or "desc" in query.lower():
                     sql_fetch = cursor.fetchall()
                     if not sql_fetch:
                         sql_fetch = self.generate_null_mapper(cursor)
@@ -104,7 +110,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                     return True, result
                 return True, ""
         except pymysql.err.OperationalError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 validation_type="id_generation",
                 status_code=500
@@ -149,13 +155,17 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         """
         generated_id = ""
         flag = False
-        if table_name == self.MASTER_TABLE:
-            print("Generating new Master ID")
-            flag, generated_id = self.create_id(connection, self.MASTER_SEQ_TABLE, self.MASTER_PREFIX, self.MASTER_ID_ZERO_COUNT)
+        if table_name == self.QUERY_TABLE:
+            print("Generating new Query ID")
+            flag, generated_id = self.create_id(connection, self.QUERY_SEQ_TABLE,
+                                                self.QUERY_PREFIX, self.QUERY_ID_ZERO_COUNT)
+        elif table_name == self.PRE_APPROVAL_TABLE:
+            print("Generating new Pre-Approval` ID")
+            flag, generated_id = self.create_id(connection, self.PRE_APPROVAL_SEQ_TABLE,
+                                                self.PRE_APPROVAL_PREFIX, self.PRE_APPROVAL_ID_ZERO_COUNT)
         return flag, generated_id
 
-    @staticmethod
-    def create_id(connection, seq_table, id_prefix, zero_fill_count):
+    def create_id(self, connection, seq_table, id_prefix, zero_fill_count):
         """
         Generate new sequence and create unique ID
         :param connection: MySQL Connector
@@ -165,7 +175,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         :return: Generated Unique ID
         """
         try:
-            with connection.cursor as cursor:
+            with connection.cursor() as cursor:
                 insert_qry = f"INSERT INTO {seq_table} VALUES (NULL);"
                 print(f"Sequence table SQL : {insert_qry}")
                 cursor.execute(insert_qry)
@@ -176,9 +186,9 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                 for row in cursor:
                     row_num = row['id']
 
-                id = id_prefix + (str(row_num).zfill(zero_fill_count))
-                print(f"Generated ID : {id}")
-                return True, id
+                created_id = id_prefix + (str(row_num).zfill(zero_fill_count))
+                print(f"Generated ID : {created_id}")
+                return True, created_id
         except pymysql.err.OperationalError as exp:
             print(str(exp))
             response = validation_object.generate_error_response(
@@ -215,7 +225,12 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         """
         try:
             with connection.cursor() as cursor:
-                query = self.PRE_DELETE.format(table_name, field_name, field_value)
+                pre_delete_dict = {
+                    "table_name": table_name,
+                    "field_name": field_name,
+                    "field_value": field_value
+                }
+                query = self.PRE_DELETE.format(**pre_delete_dict)
                 print(f'Pre-Delete Check Querying SQL : {query}')
                 cursor.execute(query=query)
                 sql_fetch = cursor.fetchone()

@@ -3,6 +3,7 @@ Utility methods
 """
 from sql_operations import SQLMethods
 from common_utils import ValidationMethods
+from string_literals import Constants, SQLConstants
 
 
 class UtilityMethods(SQLMethods, ValidationMethods):
@@ -35,3 +36,16 @@ class UtilityMethods(SQLMethods, ValidationMethods):
         else:
             query_params['record_end'] = int(query_params['record_end'])
         return True, request_details
+
+    @staticmethod
+    def table_differentiator(operation_type):
+        operation_details = {}
+        if operation_type == Constants.QUERY_TABLE_OPERATION:
+            operation_details["table_name"] = SQLConstants.QUERY_TABLE
+            operation_details["type"] = Constants.QUERY_TABLE_OPERATION
+            operation_details["field_name"] = SQLConstants.QUERY_ID
+        elif operation_type == Constants.PRE_APPROVAL_TABLE_OPERATION:
+            operation_details["table_name"] = SQLConstants.PRE_APPROVAL_TABLE
+            operation_details["type"] = Constants.PRE_APPROVAL_TABLE_OPERATION
+            operation_details["field_name"] = SQLConstants.PRE_APPROVAL_ID
+        return operation_details

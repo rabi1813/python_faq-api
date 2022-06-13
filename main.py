@@ -6,29 +6,19 @@ from flask import request
 from common_utils import CommonUtilsMethods
 from utils import UtilityMethods
 from operations import GeneralOperations
+from log_services import log_initializer
+from string_literals import Constants
 
 common_utils_object = CommonUtilsMethods()
 utils_object = UtilityMethods()
 operations_object = GeneralOperations()
 app = common_utils_object.generate_flask_app()
 
-
-@app.route("/actor", methods=["GET"])
-def actor():
-    """
-    Function to get actor details
-    :return: List of actors
-    """
-    request_details = common_utils_object.get_request_details(request)
-    flag, request_details = utils_object.pre_check(request_details)
-    if not flag:
-        return request_details
-    response = operations_object.get_actor(request_details)
-    return response
+logger = log_initializer()
 
 
-@app.route("/master", methods=["GET", "POST", "DELETE"])
-def master():
+@app.route("/query", methods=["GET", "POST", "DELETE"])
+def query():
     """
     Function to perform operations on master table
     :return: If True, returns Success response
@@ -38,18 +28,50 @@ def master():
     flag, request_details = utils_object.pre_check(request_details)
     if not flag:
         return request_details
-    response = operations_object.master_table_operations(request_details)
+    response = operations_object.table_operations(request_details,
+                                                  operation_type=Constants.QUERY_TABLE_OPERATION)
     return response
 
-@app.route("/master/<master_id>", methods=["GET"])
-def data(master_id):
+
+@app.route("/query/<query_id>", methods=["GET"])
+def query_data(query_id):
     request_details = common_utils_object.get_request_details(request)
     flag, request_details = utils_object.pre_check(request_details)
-    print(flag, request_details)
+    logger.info(flag, request_details)
     if flag is False:
         return request_details
-    response = operations_object.get_master_records_details(master_id, request_details)
-    print(response)
+    response = operations_object.get_records_details(query_id, request_details,
+                                                     operation_type=Constants.QUERY_TABLE_OPERATION)
+    logger.info(response)
+    return response
+
+
+@app.route("/approval", methods=["GET", "POST", "DELETE"])
+def approval():
+    """
+    Function to perform operations on master table
+    :return: If True, returns Success response
+             If False, returns Error response
+    """
+    request_details = common_utils_object.get_request_details(request)
+    flag, request_details = utils_object.pre_check(request_details)
+    if not flag:
+        return request_details
+    response = operations_object.table_operations(request_details,
+                                                  operation_type=Constants.PRE_APPROVAL_TABLE_OPERATION)
+    return response
+
+
+@app.route("/approval/<approval_id>", methods=["GET"])
+def approval_data(approval_id):
+    request_details = common_utils_object.get_request_details(request)
+    flag, request_details = utils_object.pre_check(request_details)
+    logger.info(flag, request_details)
+    if flag is False:
+        return request_details
+    response = operations_object.get_records_details(approval_id, request_details,
+                                                     operation_type=Constants.PRE_APPROVAL_TABLE_OPERATION)
+    logger.info(response)
     return response
 
 
