@@ -2,6 +2,8 @@
 SQL Related operations
 """
 import datetime
+import json
+
 import pymysql
 import pymysql.cursors
 from pymysql.constants import CLIENT
@@ -96,10 +98,12 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         try:
             with connection.cursor() as cursor:
                 if payload:
+                    logger.info("Query Payload: %s", json.dumps(payload))
                     query_string = query.replace("%(", "'%(").replace(")s", ")s'") % payload
                     logger.info('Querying SQL : %s', query_string)
                 else:
                     logger.info('Querying SQL : %s', query)
+
                 payload = payload if payload else {}
                 cursor.execute(query, payload)
                 if "select" in query.lower() or "show" in query.lower() or "desc" in query.lower():
@@ -107,6 +111,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                     if not sql_fetch:
                         sql_fetch = self.generate_null_mapper(cursor)
                     result = self.convert_datetime_to_string(sql_fetch)
+                    logger.info("Fetched response : %s", json.dumps(result))
                     return True, result
                 return True, ""
         except pymysql.err.OperationalError as exp:

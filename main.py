@@ -24,6 +24,7 @@ def query():
     :return: If True, returns Success response
              If False, returns Error response
     """
+    logger.info("Resource : '/query'")
     request_details = common_utils_object.get_request_details(request)
     flag, request_details = utils_object.pre_check(request_details)
     if not flag:
@@ -40,6 +41,7 @@ def query_data(query_id):
     :return: If True, returns Success response
              If False, returns Error response
     """
+    logger.info("Resource : '/query/<query_id>'")
     request_details = common_utils_object.get_request_details(request)
     flag, request_details = utils_object.pre_check(request_details)
     logger.info(flag, request_details)
@@ -58,6 +60,7 @@ def approval():
     :return: If True, returns Success response
              If False, returns Error response
     """
+    logger.info("Resource : '/approval'")
     request_details = common_utils_object.get_request_details(request)
     flag, request_details = utils_object.pre_check(request_details)
     if not flag:
@@ -74,6 +77,7 @@ def approval_data(approval_id):
     :return: If True, returns Success response
              If False, returns Error response
     """
+    logger.info("Resource : '/approval/<approval_id>'")
     request_details = common_utils_object.get_request_details(request)
     flag, request_details = utils_object.pre_check(request_details)
     logger.info(flag, request_details)

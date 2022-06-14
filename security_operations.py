@@ -45,7 +45,7 @@ class SecurityMethods:
         :param file_name: Name of secret key file name
         :return: Secret key
         """
-        with open(file_name, "rb", encoding="utf-8") as file_data:
+        with open(file_name, "rb") as file_data:
             data = file_data.read()
         return data
 

@@ -3,12 +3,14 @@ All route functions are written here
 """
 import json
 
-from string_literals import SQLConstants
+from string_literals import SQLConstants, Constants
 from utils import UtilityMethods
 from sql_operations import SQLMethods
+from log_services import log_initializer
 
 utils_object = UtilityMethods()
 sql_object = SQLMethods()
+logger = log_initializer()
 
 
 class GeneralOperations(SQLConstants):
@@ -56,13 +58,25 @@ class GeneralOperations(SQLConstants):
         # headers = request_details.get("headers")
         table_name = operation_details.get("table_name")
         field_name = operation_details.get("field_name")
+        if operation_details.get("type") == Constants.QUERY_TABLE_OPERATION:
+            search_id = SQLConstants.PRE_APPROVAL_ID
+            query = self.SELECT_QUERY.format(SQLConstants.PRE_APPROVAL_TABLE) + \
+                self.GET_LIST_ID_BASED.format(search_id, payload.get(search_id))
+
+            flag, insert_payload = utils_object.execute_query(connection, query)
+            if flag is False:
+                return insert_payload
+            insert_payload = insert_payload[0]
+            del insert_payload[search_id]
+        else:
+            insert_payload = payload
         flag, generated_id = sql_object.generate_id(connection, table_name)
         if flag is False:
             return generated_id
-        payload[field_name] = generated_id
+        insert_payload[field_name] = generated_id
         flag, response = utils_object.execute_query(connection,
                                                     self.INSERT_TABLE.format(**operation_details),
-                                                    payload)
+                                                    insert_payload)
         if flag is False:
             return response
         success_body = {
