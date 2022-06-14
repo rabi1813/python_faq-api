@@ -15,7 +15,7 @@ class UtilityMethods(SQLMethods, ValidationMethods):
     def param_null_value_generator(self, connection, request_details, table_name=None):
         """
         Check if query param values are null and update the values according
-        :param connection MySQL Connector
+        :param connection: MySQL Connector
         :param request_details: API request details
         :param table_name: Table name
         :return: API request details with updated query params
@@ -39,6 +39,11 @@ class UtilityMethods(SQLMethods, ValidationMethods):
 
     @staticmethod
     def table_differentiator(operation_type):
+        """
+        Function to differentiate the operation details based on table
+        :param operation_type: Type of operation
+        :return: Operation details
+        """
         operation_details = {}
         if operation_type == Constants.QUERY_TABLE_OPERATION:
             operation_details["table_name"] = SQLConstants.QUERY_TABLE

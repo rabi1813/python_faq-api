@@ -53,17 +53,13 @@ class GeneralOperations(SQLConstants):
                  If False, returns Error response
         """
         payload = json.loads(request_details.get("payload"))
-        headers = request_details.get("headers")
+        # headers = request_details.get("headers")
         table_name = operation_details.get("table_name")
         field_name = operation_details.get("field_name")
-        print(operation_details)
         flag, generated_id = sql_object.generate_id(connection, table_name)
         if flag is False:
             return generated_id
         payload[field_name] = generated_id
-        print(payload)
-        print(operation_details)
-        print(self.INSERT_TABLE.format(**operation_details))
         flag, response = utils_object.execute_query(connection,
                                                     self.INSERT_TABLE.format(**operation_details),
                                                     payload)
@@ -116,7 +112,7 @@ class GeneralOperations(SQLConstants):
                  If False, returns Error response
         """
         payload = json.loads(request_details.get("payload"))
-        headers = request_details.get("headers")
+        # headers = request_details.get("headers")
 
         table_name = operation_details.get("table_name")
         field_name = operation_details.get("field_name")

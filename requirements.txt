@@ -4,3 +4,4 @@ pylint
 cryptography
 pyjwt
 Flask-SQLAlchemy
+PyMySQL

@@ -99,7 +99,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                     query_string = query.replace("%(", "'%(").replace(")s", ")s'") % payload
                     logger.info('Querying SQL : %s', query_string)
                 else:
-                    logger.info(f'Querying SQL : {query}')
+                    logger.info('Querying SQL : %s', query)
                 payload = payload if payload else {}
                 cursor.execute(query, payload)
                 if "select" in query.lower() or "show" in query.lower() or "desc" in query.lower():
@@ -117,7 +117,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
             )
             return response
         except pymysql.err.ProgrammingError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 validation_type="id_generation",
                 status_code=500
@@ -134,13 +134,13 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         try:
             with connection.cursor() as cursor:
                 query = self.TABLE_ROW_COUNTER.format(table)
-                print(f'Querying SQL : {query}')
+                logger.info('Querying SQL : %s', query)
                 cursor.execute(query=query)
 
                 sql_fetch = cursor.fetchone()
                 return True, sql_fetch.get("count")
         except pymysql.err.ProgrammingError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 status_code=500
             )
@@ -156,16 +156,18 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         generated_id = ""
         flag = False
         if table_name == self.QUERY_TABLE:
-            print("Generating new Query ID")
+            logger.info("Generating new Query ID")
             flag, generated_id = self.create_id(connection, self.QUERY_SEQ_TABLE,
                                                 self.QUERY_PREFIX, self.QUERY_ID_ZERO_COUNT)
         elif table_name == self.PRE_APPROVAL_TABLE:
-            print("Generating new Pre-Approval` ID")
+            logger.info("Generating new Pre-Approval` ID")
             flag, generated_id = self.create_id(connection, self.PRE_APPROVAL_SEQ_TABLE,
-                                                self.PRE_APPROVAL_PREFIX, self.PRE_APPROVAL_ID_ZERO_COUNT)
+                                                self.PRE_APPROVAL_PREFIX,
+                                                self.PRE_APPROVAL_ID_ZERO_COUNT)
         return flag, generated_id
 
-    def create_id(self, connection, seq_table, id_prefix, zero_fill_count):
+    @staticmethod
+    def create_id(connection, seq_table, id_prefix, zero_fill_count):
         """
         Generate new sequence and create unique ID
         :param connection: MySQL Connector
@@ -177,27 +179,27 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
         try:
             with connection.cursor() as cursor:
                 insert_qry = f"INSERT INTO {seq_table} VALUES (NULL);"
-                print(f"Sequence table SQL : {insert_qry}")
+                logger.info("Sequence table SQL : %s", insert_qry)
                 cursor.execute(insert_qry)
 
                 fetch_qry = "select LAST_INSERT_ID() as id;"
-                print(f"Last inserted ID Query: {fetch_qry}")
+                logger.info("Last inserted ID Query: %s", fetch_qry)
                 cursor.execute(fetch_qry)
                 for row in cursor:
                     row_num = row['id']
 
                 created_id = id_prefix + (str(row_num).zfill(zero_fill_count))
-                print(f"Generated ID : {created_id}")
+                logger.info("Generated ID : %s", created_id)
                 return True, created_id
         except pymysql.err.OperationalError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 validation_type="id_generation",
                 status_code=500
             )
             return response
         except pymysql.err.ProgrammingError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 validation_type="id_generation",
                 status_code=500
@@ -231,7 +233,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                     "field_value": field_value
                 }
                 query = self.PRE_DELETE.format(**pre_delete_dict)
-                print(f'Pre-Delete Check Querying SQL : {query}')
+                logger.info('Pre-Delete Check Querying SQL : %s', query)
                 cursor.execute(query=query)
                 sql_fetch = cursor.fetchone()
                 count = sql_fetch.get("count")
@@ -245,7 +247,7 @@ class SQLMethods(SQLUtilityMethods, SQLConstants, ErrorMessages):
                     return response
                 return True, ""
         except pymysql.err.ProgrammingError as exp:
-            print(str(exp))
+            logger.info(str(exp))
             response = validation_object.generate_error_response(
                 status_code=500
             )

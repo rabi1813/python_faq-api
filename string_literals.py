@@ -55,7 +55,8 @@ class SQLConstants:
 
     INSERT_TABLE = "Insert into {table_name} ({field_name}, type, query, answer, " \
                    "create_datetime, create_by, mod_datetime, mod_by) values " \
-                   "(%({field_name})s, %(type)s, %(query)s, %(answer)s, now(), 'System', now(), 'System');"
+                   "(%({field_name})s, %(type)s, %(query)s, %(answer)s," \
+                   " now(), 'System', now(), 'System');"
 
     DELETE_TABLE = "Delete from {table_name} where {field_name} = '{field_value}';"
 

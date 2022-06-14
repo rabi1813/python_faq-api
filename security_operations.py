@@ -2,8 +2,10 @@
 Security related operations
 """
 import os
-from common_utils import CommonUtilsMethods
+import yaml
 from cryptography.fernet import Fernet
+
+from string_literals import Constants
 
 
 class SecurityMethods:
@@ -11,6 +13,16 @@ class SecurityMethods:
     Security related methods
     """
     __slots__ = ()
+
+    @staticmethod
+    def read_config_file():
+        """
+        Read Config File
+        :return:Config Data
+        """
+        with open(Constants.CONFIG_FILE, 'r', encoding="utf-8") as config:
+            config_details = yaml.load(config, Loader=yaml.FullLoader)
+        return config_details
 
     @staticmethod
     def generate_key_file(file_name):
@@ -33,7 +45,9 @@ class SecurityMethods:
         :param file_name: Name of secret key file name
         :return: Secret key
         """
-        return open(file_name, "rb").read()
+        with open(file_name, "rb", encoding="utf-8") as file_data:
+            data = file_data.read()
+        return data
 
     def encrypt_message(self, config_details, normal_string):
         """
@@ -71,6 +85,6 @@ class SecurityMethods:
         Decrypt config data
         :return:Decrypted config data
         """
-        config_data = CommonUtilsMethods.read_config_file()
+        config_data = self.read_config_file()
         config_data["password"] = self.decrypt_message(config_data, config_data["password"])
         return config_data

@@ -3,8 +3,10 @@ Common Utilities
 """
 import json
 import flask
-import yaml
 from string_literals import Constants, ErrorMessages
+from log_services import log_initializer
+
+logger = log_initializer()
 
 
 class CommonUtilsMethods:
@@ -39,16 +41,6 @@ class CommonUtilsMethods:
         app.config["DEBUG"] = True
 
         return app
-
-    @staticmethod
-    def read_config_file():
-        """
-        Read Config File
-        :return:Config Data
-        """
-        with open(Constants.CONFIG_FILE, 'r') as config:
-            config_details = yaml.load(config, Loader=yaml.FullLoader)
-        return config_details
 
 
 class ValidationMethods(Constants, ErrorMessages):
@@ -175,7 +167,7 @@ class ValidationMethods(Constants, ErrorMessages):
                 payload = json.loads(payload)
                 return True
             except json.decoder.JSONDecodeError as exp:
-                print(str(exp))
+                logger.info(str(exp))
                 return False
         else:
             return True
